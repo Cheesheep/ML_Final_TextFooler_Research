@@ -1,0 +1,7 @@
+﻿evaluation_set,accuracy_delta,precision_delta,recall_delta,f1_delta
+val,0.000935,0.0,0.001876,0.000943
+original_test,0.0,0.0,0.0,0.0
+textfooler_test,0.0,0.0,0.0,0.0
+trust_test,0.002801,0.0,0.005607,0.002812
+urgency_test,0.002801,0.0,0.005607,0.002812
+emotion_test,0.0,0.0,0.0,0.0

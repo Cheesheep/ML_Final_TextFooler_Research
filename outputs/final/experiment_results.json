@@ -1,0 +1,82 @@
+{
+  "dataset_metadata": {
+    "positive_count": 2677,
+    "negative_count": 2677,
+    "split_sizes": {
+      "train": 3747,
+      "val": 536,
+      "test": 1071
+    },
+    "positive_avg_turns": 9.335,
+    "positive_avg_chars": 394.464,
+    "negative_avg_turns": 9.25,
+    "negative_avg_chars": 244.005,
+    "negative_source": "LCCC base subset",
+    "random_state": 42
+  },
+  "model": {
+    "type": "TF-IDF(char 2-4 gram) + LogisticRegression(liblinear)"
+  },
+  "evaluations": {
+    "val": {
+      "accuracy": 0.998134,
+      "precision": 1.0,
+      "recall": 0.996269,
+      "f1": 0.998131,
+      "tp": 267,
+      "tn": 268,
+      "fp": 0,
+      "fn": 1
+    },
+    "original_test": {
+      "accuracy": 0.997199,
+      "precision": 1.0,
+      "recall": 0.994393,
+      "f1": 0.997188,
+      "tp": 532,
+      "tn": 536,
+      "fp": 0,
+      "fn": 3
+    },
+    "textfooler_test": {
+      "accuracy": 0.997199,
+      "precision": 1.0,
+      "recall": 0.994393,
+      "f1": 0.997188,
+      "tp": 532,
+      "tn": 536,
+      "fp": 0,
+      "fn": 3
+    },
+    "trust_test": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 535,
+      "tn": 536,
+      "fp": 0,
+      "fn": 0
+    },
+    "urgency_test": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 535,
+      "tn": 536,
+      "fp": 0,
+      "fn": 0
+    },
+    "emotion_test": {
+      "accuracy": 0.997199,
+      "precision": 1.0,
+      "recall": 0.994393,
+      "f1": 0.997188,
+      "tp": 532,
+      "tn": 536,
+      "fp": 0,
+      "fn": 3
+    }
+  }
+}

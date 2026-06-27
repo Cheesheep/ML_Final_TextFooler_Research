@@ -1,0 +1,7 @@
+﻿text,label,source,pair_id,variant,prediction,correct
+"left: 你儿子现在在我手上，不想他出事的话，马上准备五十万赎金。不要报警，否则后果自负！
+right: 你、你这是什么意思？你们到底是谁？你们为什么要这么做？",1,course_fraud,906,original,0,0
+"left: 你听清楚了吗？你儿子现在在我手上，赶紧准备五十万赎金，不然就别想见到他了！
+right: 你、你别吓我，我真的没听清楚，你说什么？我儿子怎么了？",1,course_fraud,816,original,0,0
+"left: 你儿子现在在我们手上，马上准备两百万赎金，否则后果自负！
+right: 什么？你们抓走我儿子了？这怎么可能？你们到底是谁？",1,course_fraud,984,original,0,0

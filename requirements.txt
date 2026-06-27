@@ -1,0 +1,7 @@
+numpy>=1.26
+pandas>=2.2
+openpyxl>=3.1
+scikit-learn>=1.5
+matplotlib>=3.9
+seaborn>=0.13
+datasets>=4.0
