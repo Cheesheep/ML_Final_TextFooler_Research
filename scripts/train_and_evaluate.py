@@ -22,6 +22,7 @@ from fraud_call_benchmark.metrics import classification_metrics
 
 
 def evaluate_frame(model: Pipeline, frame: pd.DataFrame) -> tuple[dict[str, float], pd.DataFrame]:
+    # 指标和逐条预测结果一起回传，后面导表和查误判都靠这一份结果。
     preds = model.predict(frame["text"].tolist())
     result_frame = frame.copy()
     result_frame["prediction"] = preds
@@ -30,6 +31,7 @@ def evaluate_frame(model: Pipeline, frame: pd.DataFrame) -> tuple[dict[str, floa
 
 
 def build_model() -> Pipeline:
+    # 这里保持成一条标准 sklearn pipeline，训练和推理时走的是同一套预处理。
     return Pipeline(
         steps=[
             (
@@ -54,6 +56,7 @@ def build_model() -> Pipeline:
 
 
 def build_metrics_table(results: dict) -> pd.DataFrame:
+    # json 结果更适合机器读，表格更适合论文和人工核对，两份都保留。
     rows = []
     for name, metrics in results["evaluations"].items():
         rows.append(
@@ -73,6 +76,7 @@ def build_metrics_table(results: dict) -> pd.DataFrame:
 
 
 def plot_metric_bars(metrics_table: pd.DataFrame, output_dir: Path) -> None:
+    # 图只画几项核心指标，方便直接看不同改写测试集之间的落差。
     plt.figure(figsize=(11, 6))
     melted = metrics_table.melt(
         id_vars=["evaluation_set"],
@@ -92,6 +96,7 @@ def plot_metric_bars(metrics_table: pd.DataFrame, output_dir: Path) -> None:
 
 
 def build_delta_table(metrics_table: pd.DataFrame) -> pd.DataFrame:
+    # 所有改写结果都拿 original_test 当参照，这样对比口径是一致的。
     base = metrics_table[metrics_table["evaluation_set"] == "original_test"].iloc[0]
     rows = []
     for _, row in metrics_table.iterrows():
@@ -117,6 +122,7 @@ def main() -> None:
     parser.add_argument("--output-dir", default=str(PROJECT_ROOT / "outputs" / "final"))
     args = parser.parse_args()
 
+    # bundle 里已经把 full_dataset 和几类测试变体都整理好了，训练脚本只负责消费。
     bundle = load_dataset_bundle(args.bundle_dir)
     full = bundle.full_dataset.copy()
     train = full[full["split"] == "train"].copy()
@@ -135,6 +141,7 @@ def main() -> None:
     }
     evaluations: dict[str, dict[str, float]] = {}
     prediction_frames: dict[str, pd.DataFrame] = {}
+    # 同一个模型顺次跑各个测试版本，保证对比只来自文本改写，不来自模型波动。
     for name, frame in frames.items():
         metrics, pred_frame = evaluate_frame(model, frame)
         evaluations[name] = metrics
@@ -152,6 +159,7 @@ def main() -> None:
     for name, pred_frame in prediction_frames.items():
         pred_frame.to_csv(details_dir / f"{name}.csv", index=False, encoding="utf-8-sig")
 
+    # 漏判正类单独导出来，后面做案例分析不用再翻整张预测表。
     original_fn = prediction_frames["original_test"]
     original_fn = original_fn[(original_fn["label"] == 1) & (original_fn["prediction"] == 0)].copy()
     if not original_fn.empty:

@@ -10,15 +10,6 @@
 - 实验源码：`src/fraud_call_benchmark/`
 - 最终实验输出：`outputs/final/`
 
-## 未导出内容
-
-- `AGENTS.md`
-- `docs/`
-- `paper/`
-- `项目要求.md`
-- `data/raw/`
-- `.git/`
-
 ## 直接可运行的命令
 
 ```powershell

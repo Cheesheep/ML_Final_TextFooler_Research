@@ -21,6 +21,7 @@ from fraud_call_benchmark.data import count_dialog_turns, load_attack_pairs
 
 
 def normalize_lccc_utterance(text: str) -> str:
+    # LCCC 原始对话里空白和换行比较杂，这里先压平，后面统一按 left/right 组织。
     return "".join(str(text).split())
 
 
@@ -33,6 +34,7 @@ def format_dialog(dialog: list[str]) -> str:
 
 
 def stream_negative_candidates(files: list[Path], target_pool: int = 20000) -> list[dict]:
+    # 先从公开对话里捞一批“像正常通话”的候选，再在后面按统计特征精筛。
     candidates: list[dict] = []
     seen: set[str] = set()
 
@@ -53,6 +55,7 @@ def stream_negative_candidates(files: list[Path], target_pool: int = 20000) -> l
                     continue
                 if chars < 120 or chars > 900:
                     continue
+                # 这类文本和诈骗话术过于接近，直接混进负类会把边界搞脏。
                 if "退款" in formatted and "链接" in formatted and "银行卡" in formatted:
                     continue
                 candidates.append(
@@ -71,6 +74,7 @@ def stream_negative_candidates(files: list[Path], target_pool: int = 20000) -> l
 
 
 def build_test_variant(base_test: pd.DataFrame, fraud_rewriter, name: str) -> pd.DataFrame:
+    # 这里只改正类文本，负类保持不动，方便看模型对同一批欺诈样本改写前后的变化。
     variant = base_test.copy()
     fraud_mask = variant["label"] == 1
     variant.loc[fraud_mask, "text"] = variant.loc[fraud_mask, "text"].map(fraud_rewriter)
@@ -99,6 +103,7 @@ def main() -> None:
     args = parser.parse_args()
 
     rng = np.random.default_rng(args.random_state)
+    # 正类直接来自原始欺诈数据，pair_id 保留下来，后面做误判追踪要用。
     positives = load_attack_pairs(args.attack_xlsx).copy()
     positives["pair_id"] = np.arange(len(positives))
     positives["text"] = positives["original_text"]
@@ -123,6 +128,7 @@ def main() -> None:
         )
     positive_turn_mean = float(positives["num_turns"].mean())
     positive_char_mean = float(positives["num_chars"].mean())
+    # 负类不是随机抽，尽量往正类的轮次和长度分布上靠，不然太容易被模型学成“长短分类器”。
     negative_candidates["match_score"] = (
         (negative_candidates["num_turns"] - positive_turn_mean).abs() / positive_turn_mean
         + (negative_candidates["num_chars"] - positive_char_mean).abs() / positive_char_mean
@@ -148,6 +154,7 @@ def main() -> None:
         ignore_index=True,
     )
 
+    # 这里先做 train/test，再从 train_val 切出 val，保证三份数据都是分层抽样。
     train_val, test = train_test_split(
         full,
         test_size=0.2,
@@ -172,6 +179,7 @@ def main() -> None:
     original_test = test[["text", "label", "source", "pair_id"]].copy()
     original_test["variant"] = "original"
 
+    # TextFooler 版本复用同一批测试样本，只替换正类文本，避免引入额外样本波动。
     textfooler_test = test.copy()
     fraud_mask = textfooler_test["label"] == 1
     textfooler_test.loc[fraud_mask, "text"] = textfooler_test.loc[fraud_mask, "attacked_text"]
@@ -185,6 +193,7 @@ def main() -> None:
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    # 处理后的数据包单独落盘，训练脚本只认这里，不再回头扫原始文件。
     full_dataset.to_csv(output_dir / "full_dataset.csv", index=False, encoding="utf-8-sig")
     original_test.to_csv(output_dir / "original_test.csv", index=False, encoding="utf-8-sig")
     textfooler_test.to_csv(output_dir / "textfooler_test.csv", index=False, encoding="utf-8-sig")

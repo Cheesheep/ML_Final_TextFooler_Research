@@ -13,6 +13,7 @@ TITLE_FONT = Path(r"C:\Windows\Fonts\msyhbd.ttc")
 
 
 def load_font(size: int, *, bold: bool = False) -> ImageFont.FreeTypeFont:
+    # Windows 自带字体基本够用，这里直接走本机字体，省得图在不同机器上变形。
     font_path = TITLE_FONT if bold and TITLE_FONT.exists() else DEFAULT_FONT
     return ImageFont.truetype(str(font_path), size=size)
 
@@ -26,6 +27,7 @@ def draw_rounded_box(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int], 
 
 
 def draw_arrow(draw: ImageDraw.ImageDraw, start: tuple[int, int], end: tuple[int, int], color: str) -> None:
+    # Pillow 没有现成的流程图箭头，这里手动画线和箭头头部。
     draw.line([start, end], fill=color, width=5)
     dx = end[0] - start[0]
     dy = end[1] - start[1]
@@ -53,6 +55,7 @@ def centered_multiline(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int]
 
 
 def build_flowchart(output_path: Path) -> None:
+    # 这张图主要是给整体实验流程做交代，和性能图的作用不一样。
     image = Image.new("RGB", (1800, 1100), "#fbfcfd")
     draw = ImageDraw.Draw(image)
     title_font = load_font(44, bold=True)
@@ -89,6 +92,7 @@ def build_flowchart(output_path: Path) -> None:
 
 
 def normalize_dialogue(text: str) -> str:
+    # 图里直接展示原始 left/right 可读性一般，这里顺手换成中文说话人标记。
     return text.replace("left:", "诈骗方：").replace("right:", "受害者：").replace("\r", "").strip()
 
 
@@ -103,6 +107,7 @@ def build_false_negative_case_figure(
     urgency_path: Path,
     output_path: Path,
 ) -> None:
+    # 误判案例图直接拿原始漏判样本和改写后的版本并排放，方便看预测是怎么被拉回来的。
     false_negative = read_cases(false_negative_path)
     trust = {row["pair_id"]: row for row in read_cases(trust_path)}
     urgency = {row["pair_id"]: row for row in read_cases(urgency_path)}
@@ -156,6 +161,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    # 所有图都丢回 final 目录，后面 README、论文和结果说明都从这里取。
     result_dir = Path(args.result_dir)
     result_dir.mkdir(parents=True, exist_ok=True)
 

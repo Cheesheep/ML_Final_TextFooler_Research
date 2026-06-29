@@ -23,6 +23,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    # 这里先把原始 Excel 统一读成标准字段，后面的审计逻辑就只关心文本本身了。
     frame = load_attack_pairs(args.attack_xlsx)
     audit = audit_attack_pairs(frame)
 
@@ -36,6 +37,7 @@ def main() -> None:
         "preview": frame.head(3).to_dict(orient="records"),
     }
 
+    # 审计结果单独落一个 json，后面写实验说明和核对数据时都会直接用到。
     output_path = Path(args.output_json)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
