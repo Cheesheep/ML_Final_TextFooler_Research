@@ -6,7 +6,7 @@
 
 - 课程原始攻击数据：`data/TextFooler攻击后新的欺诈通话数据.xlsx`
 - 已处理实验数据包：`data/processed/fraud_benchmark/`
-- 训练与评测脚本：`scripts/`
+- 训练与评测脚本：`scripts/audit_dataset.py`、`scripts/prepare_experiment_data.py`、`scripts/train_and_evaluate.py`
 - 实验源码：`src/fraud_call_benchmark/`
 - 最终实验输出：`outputs/final/`
 
